@@ -45,25 +45,47 @@ logic
     [next spot in direction]
 
  */
+var coords = {
+    convert: function (coId) { return coId.split('v').map(function($str) { return parseInt($str); }); },
+    mutate: function (mutation, co) {
+        return [co[0] + mutation[0],co[1] + mutation[1]];
+    },
+    toCoId: function (co) { return co[0]+'v'+co[1]; },
+
+    up: function(coId) { return coords.toCoId(coords.mutate([-1,0], coords.convert(coId))); },
+    down: function(coId) { return coords.toCoId(coords.mutate([1,0], coords.convert(coId))); },
+    left: function(coId) { return coords.toCoId(coords.mutate([0,-1], coords.convert(coId))); },
+    right: function(coId) { return coords.toCoId(coords.mutate([0,1], coords.convert(coId))); }
+}
+
 
 var matrix = {
-    rows: 10,
-    cols: 10,
+    rows: 15,
+    cols: 15,
     lifecycle: 250,
 
+    nextSpotInDirection: function (coId) {
+        if(typeof this.direction === 'undefined') { this.direction = coords.down; }
+        $spot = $('#'+this.direction(coId));
+        return $spot;
+    },
     createSnake: function () {
+        var $tail = this.randomSpot();
+        while(! this.takenBy(this.cleanpart(), $tail)) { $tail = this.randomSpot(); }
+        $tail.html(this.tailpart());
 
+        var $head = this.nextSpotInDirection($tail.attr('id'));
+        $head.html(this.headpart());
     },
 
     randomSpot: function () {
         return $('#'+Math.floor((Math.random() * 10) + 1)+'v'+Math.floor((Math.random() * 10) + 1));
     },
-    takenBy: function (part, $spot) {
-        return $spot.html() == part();
-    },
+    takenBy: function ($left, $right) { return $right.children($left).length == 1; },
+
     createFood: function () {
         var $spot = this.randomSpot();
-        while(! this.takenBy(this.cleanpart, $spot)) { $spot = this.randomSpot(); }
+        while(! this.takenBy(this.cleanpart(), $spot)) { $spot = this.randomSpot(); }
         $spot.html(this.foodpart());
     },
 
@@ -71,7 +93,7 @@ var matrix = {
         $anchor = anchor;
         this.fillUp();
         this.createSnake();
-        //this.createFood();
+        this.createFood();
     },
 
     cleanpart: function () { return $('<div />', {class: 'empty', html: '&nbsp;'}); },
