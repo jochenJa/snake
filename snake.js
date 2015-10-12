@@ -42,6 +42,56 @@ logic
             - tail becomes [next tailpart]
             - [tailpart] becomes [cleanpart]
 
+    [next spot in direction]
+
  */
+
+var matrix = {
+    rows: 10,
+    cols: 10,
+    lifecycle: 250,
+
+    createSnake: function () {
+
+    },
+
+    createFood: function () {
+
+    },
+
+    init: function(anchor) {
+        $anchor = anchor;
+        this.fillUp();
+        this.createSnake();
+        this.createFood();
+    },
+
+    cleanpart: function () { return 'O'; },
+    foodpart: function () { return 'F'; },
+    headpart: function () { return 'H'; },
+    tailpart: function () { return '*'; },
+
+    co: function (i, j) { return i + 'v' + j; },
+
+    fillUp: function() {
+        var $container = $('<div />', {id: 'matrix'});
+        for(var i=1;i<=this.rows;i++) {
+            for(var j=1;j<=this.cols;j++) {
+                var $col = $('<div />', {
+                    id: this.co(i, j),
+                    html: this.cleanpart()
+                });
+
+                $container.append($col);
+            }
+            $container.append($('<br>'));
+        }
+        $anchor.append($container);
+    },
+
+    wakesUp: function() {
+
+    }
+}
 
 

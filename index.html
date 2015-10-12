@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>some snake ?</title>
-
+    <link rel="stylesheet" href="snake.css">
 </head>
 <body>
  <div id="snake_window"></div>
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+ <script type="text/javascript" src="snake.js"></script>
+ <script type="text/javascript">
+     jQuery('document').ready(function($) {
+         matrix.init($('#snake_window'));
+     });
+ </script>
 </body>
 </html>
