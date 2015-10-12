@@ -1,3 +1,25 @@
 #matrix > div {
     display: inline-block;
+    width: 45px;
+    height: 45px;
+}
+
+#matrix div.empty {
+    background-color: #000;
+    height: inherit;
+}
+
+#matrix div.food {
+    background-color: yellow;
+    height: inherit;
+}
+
+#matrix div.head {
+    background-color: darkgreen;
+    height: inherit;
+}
+
+#matrix div.tail {
+    background-color: green;
+    height: inherit;
 }

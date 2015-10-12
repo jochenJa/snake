@@ -55,21 +55,29 @@ var matrix = {
 
     },
 
+    randomSpot: function () {
+        return $('#'+Math.floor((Math.random() * 10) + 1)+'v'+Math.floor((Math.random() * 10) + 1));
+    },
+    takenBy: function (part, $spot) {
+        return $spot.html() == part();
+    },
     createFood: function () {
-
+        var $spot = this.randomSpot();
+        while(! this.takenBy(this.cleanpart, $spot)) { $spot = this.randomSpot(); }
+        $spot.html(this.foodpart());
     },
 
     init: function(anchor) {
         $anchor = anchor;
         this.fillUp();
         this.createSnake();
-        this.createFood();
+        //this.createFood();
     },
 
-    cleanpart: function () { return 'O'; },
-    foodpart: function () { return 'F'; },
-    headpart: function () { return 'H'; },
-    tailpart: function () { return '*'; },
+    cleanpart: function () { return $('<div />', {class: 'empty', html: '&nbsp;'}); },
+    foodpart: function () { return $('<div />', {class: 'food', html: '&nbsp;'}); },
+    headpart: function () { return $('<div />', {class: 'head', html: '&nbsp;'}); },
+    tailpart: function () { return $('<div />', {class: 'tail', html: '&nbsp;'}); },
 
     co: function (i, j) { return i + 'v' + j; },
 
