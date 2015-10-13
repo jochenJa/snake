@@ -70,6 +70,7 @@ var matrix = {
     rows: 15,
     cols: 15,
     lifecycle: 300,
+    tail: [],
 
     nextSpotInDirection: function (coId) {
         if(typeof this.direction === 'undefined') { this.direction = coords.randomDirection(); }
@@ -77,11 +78,12 @@ var matrix = {
         return $spot;
     },
     createSnake: function () {
-        this.$tail = this.randomSpot();
-        while(! this.takenBy(this.cleanpart(), this.$tail)) { this.$tail = this.randomSpot(); }
-        this.$tail.html(this.tailpart());
+        var $tail;
+        do { $tail = this.randomSpot(); } while(! this.takenBy(this.cleanpart(), $tail))
+        $tail.html(this.tailpart());
+        this.tail.unshift($tail.attr('id'));
 
-        this.$head = this.nextSpotInDirection(this.$tail.attr('id'));
+        this.$head = this.nextSpotInDirection($tail.attr('id'));
         this.$head.html(this.headpart());
     },
 
@@ -93,8 +95,8 @@ var matrix = {
     },
 
     createFood: function () {
-        var $spot = this.randomSpot();
-        while(! this.takenBy(this.cleanpart(), $spot)) { $spot = this.randomSpot(); }
+        var $spot;
+        do { $spot = this.randomSpot(); } while(! this.takenBy(this.cleanpart(), $spot))
         $spot.html(this.foodpart());
     },
 
@@ -126,34 +128,23 @@ var matrix = {
         $anchor.append($container);
     },
 
-    nextTailSpot: function (coId) {
-        switch(true) {
-            case this.takenBy(this.tailpart(), $('#'+coords.up(coId))):
-                return $('#'+coords.up(coId));
-            case this.takenBy(this.tailpart(), $('#'+coords.down(coId))):
-                return $('#'+coords.down(coId));
-            case this.takenBy(this.tailpart(), $('#'+coords.left(coId))):
-                return $('#'+coords.left(coId));
-            case this.takenBy(this.tailpart(), $('#'+coords.right(coId))):
-                return $('#'+coords.right(coId));
-            default:
-                return false;
-        }
-    },
+    spot: function (coId) { return $('#' + coId); },
+
     snakeMoves: function () {
         var $spot = this.nextSpotInDirection(this.$head.attr('id'));
         switch(true) {
             case this.takenBy(this.cleanpart(), $spot):
-                this.$tail.html(this.cleanpart());
-                $end = this.nextTailSpot(this.$tail.attr('id'));
-                this.$tail = $end ? $end : this.$head;
+                $tail = this.spot(this.tail.shift());
+                $tail.html(this.cleanpart());
 
                 this.$head.html(this.tailpart());
+                this.tail.push(this.$head.attr('id'));
                 this.$head = $spot;
                 this.$head.html(this.headpart());
                 return true;
             case this.takenBy(this.foodpart(), $spot):
                 this.$head.html(this.tailpart());
+                this.tail.push(this.$head.attr('id'));
                 this.$head = $spot;
                 this.$head.html(this.headpart());
 
@@ -163,6 +154,7 @@ var matrix = {
                 return false;
         }
     },
+
     wakesUp: function() {
         var id = setInterval(function() {
             if(! matrix.snakeMoves()) {
