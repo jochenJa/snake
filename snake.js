@@ -67,9 +67,9 @@ var coords = {
 
 
 var matrix = {
-    rows: 15,
-    cols: 15,
-    lifecycle: 300,
+    rows: 30,
+    cols: 30,
+    lifecycle: 200,
     tail: [],
 
     nextSpotInDirection: function (coId) {
