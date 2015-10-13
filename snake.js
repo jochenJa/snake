@@ -55,7 +55,14 @@ var coords = {
     up: function(coId) { return coords.toCoId(coords.mutate([-1,0], coords.convert(coId))); },
     down: function(coId) { return coords.toCoId(coords.mutate([1,0], coords.convert(coId))); },
     left: function(coId) { return coords.toCoId(coords.mutate([0,-1], coords.convert(coId))); },
-    right: function(coId) { return coords.toCoId(coords.mutate([0,1], coords.convert(coId))); }
+    right: function(coId) { return coords.toCoId(coords.mutate([0,1], coords.convert(coId))); },
+
+    randomDirection: function() {
+        var arr = [coords.down, coords.up, coords.left, coords.right];
+        var index = Math.floor(Math.random() * 4);
+
+        return arr[index];
+    }
 }
 
 
@@ -65,30 +72,34 @@ var matrix = {
     lifecycle: 1000,
 
     nextSpotInDirection: function (coId) {
-        if(typeof this.direction === 'undefined') { this.direction = coords.down; }
+        if(typeof this.direction === 'undefined') { this.direction = coords.randomDirection(); }
         $spot = $('#'+this.direction(coId));
         return $spot;
     },
     createSnake: function () {
+        console.log('create snake');
         this.$tail = this.randomSpot();
-        if(! this.takenBy(this.cleanpart(), this.$tail)) { this.$tail = this.randomSpot(); }
+        while(! this.takenBy(this.cleanpart(), this.$tail)) { this.$tail = this.randomSpot(); }
         this.$tail.html(this.tailpart());
 
         this.$head = this.nextSpotInDirection(this.$tail.attr('id'));
         this.$head.html(this.headpart());
+        console.log('snake created');
     },
 
     randomSpot: function () {
         return $('#'+Math.floor((Math.random() * 10) + 1)+'v'+Math.floor((Math.random() * 10) + 1));
     },
-    takenBy: function ($left, $right) {
-        console.log($right.children($left.attr('class')));
-        return $right.children($left.attr('class')).length > 0; },
+    takenBy: function ($part, $container) {
+        return $container.children('.' + $part.attr('class')).length > 0;
+    },
 
     createFood: function () {
+        console.log('create food');
         var $spot = this.randomSpot();
-        if(! this.takenBy(this.cleanpart(), $spot)) { $spot = this.randomSpot(); }
+        while(! this.takenBy(this.cleanpart(), $spot)) { $spot = this.randomSpot(); }
         $spot.html(this.foodpart());
+        console.log('fed.');
     },
 
     init: function(anchor) {
@@ -120,7 +131,6 @@ var matrix = {
     },
 
     nextTailSpot: function (coId) {
-        console.log(this.takenBy(this.tailpart(), $('#'+coords.up(coId))));
         switch(true) {
             case this.takenBy(this.tailpart(), $('#'+coords.up(coId))):
                 return $('#'+coords.up(coId));
@@ -140,9 +150,9 @@ var matrix = {
         switch(true) {
             case this.takenBy(this.cleanpart(), $spot):
                 this.$tail.html(this.cleanpart());
-                this.$tail = this.nextTailSpot(this.$tail.attr('id'));
-                console.log(this.$tail);
-            //case this.takenBy(this.foodpart(), $spot):
+                $end = this.nextTailSpot(this.$tail.attr('id'));
+                this.$tail = $end ? $end : this.$head;
+            case this.takenBy(this.foodpart(), $spot):
                 this.$head.html(this.tailpart());
                 this.$head = $spot;
                 this.$head.html(this.headpart());
