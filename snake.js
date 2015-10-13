@@ -62,7 +62,7 @@ var coords = {
 var matrix = {
     rows: 15,
     cols: 15,
-    lifecycle: 250,
+    lifecycle: 1000,
 
     nextSpotInDirection: function (coId) {
         if(typeof this.direction === 'undefined') { this.direction = coords.down; }
@@ -70,22 +70,24 @@ var matrix = {
         return $spot;
     },
     createSnake: function () {
-        var $tail = this.randomSpot();
-        while(! this.takenBy(this.cleanpart(), $tail)) { $tail = this.randomSpot(); }
-        $tail.html(this.tailpart());
+        this.$tail = this.randomSpot();
+        if(! this.takenBy(this.cleanpart(), this.$tail)) { this.$tail = this.randomSpot(); }
+        this.$tail.html(this.tailpart());
 
-        var $head = this.nextSpotInDirection($tail.attr('id'));
-        $head.html(this.headpart());
+        this.$head = this.nextSpotInDirection(this.$tail.attr('id'));
+        this.$head.html(this.headpart());
     },
 
     randomSpot: function () {
         return $('#'+Math.floor((Math.random() * 10) + 1)+'v'+Math.floor((Math.random() * 10) + 1));
     },
-    takenBy: function ($left, $right) { return $right.children($left).length == 1; },
+    takenBy: function ($left, $right) {
+        console.log($right.children($left.attr('class')));
+        return $right.children($left.attr('class')).length > 0; },
 
     createFood: function () {
         var $spot = this.randomSpot();
-        while(! this.takenBy(this.cleanpart(), $spot)) { $spot = this.randomSpot(); }
+        if(! this.takenBy(this.cleanpart(), $spot)) { $spot = this.randomSpot(); }
         $spot.html(this.foodpart());
     },
 
@@ -101,14 +103,12 @@ var matrix = {
     headpart: function () { return $('<div />', {class: 'head', html: '&nbsp;'}); },
     tailpart: function () { return $('<div />', {class: 'tail', html: '&nbsp;'}); },
 
-    co: function (i, j) { return i + 'v' + j; },
-
     fillUp: function() {
         var $container = $('<div />', {id: 'matrix'});
         for(var i=1;i<=this.rows;i++) {
             for(var j=1;j<=this.cols;j++) {
                 var $col = $('<div />', {
-                    id: this.co(i, j),
+                    id: coords.toCoId([i, j]),
                     html: this.cleanpart()
                 });
 
@@ -119,8 +119,44 @@ var matrix = {
         $anchor.append($container);
     },
 
+    nextTailSpot: function (coId) {
+        console.log(this.takenBy(this.tailpart(), $('#'+coords.up(coId))));
+        switch(true) {
+            case this.takenBy(this.tailpart(), $('#'+coords.up(coId))):
+                return $('#'+coords.up(coId));
+            case this.takenBy(this.tailpart(), $('#'+coords.down(coId))):
+                return $('#'+coords.down(coId));
+            case this.takenBy(this.tailpart(), $('#'+coords.left(coId))):
+                return $('#'+coords.left(coId));
+            case this.takenBy(this.tailpart(), $('#'+coords.right(coId))):
+                return $('#'+coords.right(coId));
+            default:
+                return false;
+        }
+    },
+    snakeMoves: function () {
+        var $spot = this.nextSpotInDirection(this.$head.attr('id'));
+        console.log($spot);
+        switch(true) {
+            case this.takenBy(this.cleanpart(), $spot):
+                this.$tail.html(this.cleanpart());
+                this.$tail = this.nextTailSpot(this.$tail.attr('id'));
+                console.log(this.$tail);
+            //case this.takenBy(this.foodpart(), $spot):
+                this.$head.html(this.tailpart());
+                this.$head = $spot;
+                this.$head.html(this.headpart());
+                return true;
+            default :
+                return false;
+        }
+    },
     wakesUp: function() {
-
+        var id = setInterval(function() {
+            if(! matrix.snakeMoves()) {
+                console.log('snake dead ?');
+                clearInterval(id); }
+        }, this.lifecycle);
     }
 }
 
