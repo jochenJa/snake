@@ -77,14 +77,12 @@ var matrix = {
         return $spot;
     },
     createSnake: function () {
-        console.log('create snake');
         this.$tail = this.randomSpot();
         while(! this.takenBy(this.cleanpart(), this.$tail)) { this.$tail = this.randomSpot(); }
         this.$tail.html(this.tailpart());
 
         this.$head = this.nextSpotInDirection(this.$tail.attr('id'));
         this.$head.html(this.headpart());
-        console.log('snake created');
     },
 
     randomSpot: function () {
@@ -95,11 +93,9 @@ var matrix = {
     },
 
     createFood: function () {
-        console.log('create food');
         var $spot = this.randomSpot();
         while(! this.takenBy(this.cleanpart(), $spot)) { $spot = this.randomSpot(); }
         $spot.html(this.foodpart());
-        console.log('fed.');
     },
 
     init: function(anchor) {
