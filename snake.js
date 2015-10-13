@@ -69,7 +69,7 @@ var coords = {
 var matrix = {
     rows: 15,
     cols: 15,
-    lifecycle: 1000,
+    lifecycle: 300,
 
     nextSpotInDirection: function (coId) {
         if(typeof this.direction === 'undefined') { this.direction = coords.randomDirection(); }
@@ -146,16 +146,22 @@ var matrix = {
     },
     snakeMoves: function () {
         var $spot = this.nextSpotInDirection(this.$head.attr('id'));
-        console.log($spot);
         switch(true) {
             case this.takenBy(this.cleanpart(), $spot):
                 this.$tail.html(this.cleanpart());
                 $end = this.nextTailSpot(this.$tail.attr('id'));
                 this.$tail = $end ? $end : this.$head;
+
+                this.$head.html(this.tailpart());
+                this.$head = $spot;
+                this.$head.html(this.headpart());
+                return true;
             case this.takenBy(this.foodpart(), $spot):
                 this.$head.html(this.tailpart());
                 this.$head = $spot;
                 this.$head.html(this.headpart());
+
+                this.createFood();
                 return true;
             default :
                 return false;

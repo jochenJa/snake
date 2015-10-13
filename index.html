@@ -13,7 +13,27 @@
      jQuery('document').ready(function($) {
          matrix.init($('#snake_window'));
          matrix.wakesUp();
+
+         $(this).keydown(function(e) {
+             var changedirection = function(e) {
+                 switch(e.which) {
+                     case 37:
+                         return coords.left;
+                     case 38:
+                         return coords.up;
+                     case 39:
+                         return coords.right;
+                     case 40:
+                         return coords.down;
+                     default: return;
+                 }
+             };
+
+             matrix.direction = changedirection(e);
+             e.preventDefault();
+         });
      });
+
  </script>
 </body>
 </html>
