@@ -44,6 +44,9 @@ logic
 
     [next spot in direction]
 
+    next level When snake eats 3 times
+    level defines lifecycle speed , lifecycle + (10 * level)
+
  */
 var coords = {
     convert: function (coId) { return coId.split('v').map(function($str) { return parseInt($str); }); },
@@ -71,6 +74,7 @@ var matrix = {
     cols: 30,
     lifecycle: 200,
     tail: [],
+    level: 1,
 
     nextSpotInDirection: function (coId) {
         if(typeof this.direction === 'undefined') { this.direction = coords.randomDirection(); }
@@ -100,9 +104,13 @@ var matrix = {
         $spot.html(this.foodpart());
     },
 
+    levelTracker: function () {
+        return $('<div />', {id: 'leveltracker', html: 'Level ' + this.level});
+    },
     init: function(anchor) {
         $anchor = anchor;
         this.fillUp();
+        $anchor.append(this.levelTracker());
         this.createSnake();
         this.createFood();
     },
