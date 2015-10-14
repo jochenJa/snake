@@ -72,8 +72,8 @@ var coords = {
 var matrix = {
     rows: 30,
     cols: 30,
-    lifecycle: 200,
-    lifecycleStep: 10,
+    lifecycle: 240,
+    lifecycleStep: 6,
     tail: [],
     level: 1,
 
@@ -172,6 +172,8 @@ var matrix = {
 
     nextLevel: function(previousLevel) {
         if(previousLevel) { clearInterval(previousLevel); }
+        this.level++;
+        $('#leveltracker').replaceWith(this.levelTracker());
         var id = setInterval(function() {
             matrix.snakeMoves(
                 function() { matrix.nextLevel(id); console.log('next level');},
