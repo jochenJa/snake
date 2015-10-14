@@ -160,8 +160,10 @@ var matrix = {
         }
 
         // next level when snake grows by 3 tailparts
-        console.log(this.tail.length + ':' + Math.floor(this.tail.length/3) +':'+ this.level);
-        if(Math.floor(this.tail.length/3) > this.level) { nextLevel(); }
+        if(Math.floor(this.tail.length/3) > this.level) {
+            this.level++;
+            nextLevel();
+        }
 
         if(this.level > Math.floor(this.lifecycle/this.lifecycleStep)) { endGame('Game finished!'); }
     },
@@ -172,7 +174,6 @@ var matrix = {
 
     nextLevel: function(previousLevel) {
         if(previousLevel) { clearInterval(previousLevel); }
-        this.level++;
         $('#leveltracker').replaceWith(this.levelTracker());
         var id = setInterval(function() {
             matrix.snakeMoves(
@@ -180,7 +181,9 @@ var matrix = {
                 function(message) { clearInterval(id); console.log(message);}
             );
         }, (this.lifecycle - (this.level * this.lifecycleStep)) );
-    }
+    },
+
+    changedirection: function(direction) { this.direction = direction; }
 }
 
 

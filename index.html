@@ -15,22 +15,21 @@
          matrix.wakesUp();
 
          $(this).keydown(function(e) {
-             var changedirection = function(e) {
-                 switch(e.which) {
-                     case 37:
-                         return coords.left;
-                     case 38:
-                         return coords.up;
-                     case 39:
-                         return coords.right;
-                     case 40:
-                         return coords.down;
-                     default: return;
-                 }
-             };
-
-             matrix.direction = changedirection(e);
-             e.preventDefault();
+             switch(e.which) {
+                 case 37:
+                     matrix.changedirection(coords.left);
+                     break;
+                 case 38:
+                     matrix.changedirection(coords.up);
+                     break;
+                 case 39:
+                     matrix.changedirection(coords.right);
+                     break;
+                 case 40:
+                     matrix.changedirection(coords.down);
+                     break;
+                 default: return;
+             }
          });
      });
 
