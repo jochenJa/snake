@@ -150,7 +150,7 @@ var matrix = {
                 this.tail.push(this.$head.attr('id'));
                 this.$head = $spot;
                 this.$head.html(this.headpart());
-                return true;
+                break;
             case this.takenBy(this.foodpart(), $spot):
                 this.$head.html(this.tailpart());
                 this.tail.push(this.$head.attr('id'));
@@ -158,11 +158,11 @@ var matrix = {
                 this.$head.html(this.headpart());
 
                 this.createFood();
-                nextLevel();
-                return true;
+
+                if(Math.floor(this.tail.length/3) )nextLevel();
+                break;
             default :
                 endGame();
-                return false;
         }
     },
 
