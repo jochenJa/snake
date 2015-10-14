@@ -73,6 +73,7 @@ var matrix = {
     rows: 30,
     cols: 30,
     lifecycle: 200,
+    lifecycleStep: 10,
     tail: [],
     level: 1,
 
@@ -138,7 +139,7 @@ var matrix = {
 
     spot: function (coId) { return $('#' + coId); },
 
-    snakeMoves: function () {
+    snakeMoves: function (nextLevel, endGame) {
         var $spot = this.nextSpotInDirection(this.$head.attr('id'));
         switch(true) {
             case this.takenBy(this.cleanpart(), $spot):
@@ -157,18 +158,26 @@ var matrix = {
                 this.$head.html(this.headpart());
 
                 this.createFood();
+                nextLevel();
                 return true;
             default :
+                endGame();
                 return false;
         }
     },
 
     wakesUp: function() {
+        this.nextLevel();
+    },
+
+    nextLevel: function(previousLevel) {
+        if(previousLevel) { clearInterval(previousLevel); }
         var id = setInterval(function() {
-            if(! matrix.snakeMoves()) {
-                console.log('snake dead ?');
-                clearInterval(id); }
-        }, this.lifecycle);
+            matrix.snakeMoves(
+                function() { matrix.nextLevel(id); console.log('next level');},
+                function() { clearInterval(id); console.log('end game, snake died.');}
+            );
+        }, (this.lifecycle - (this.level * this.lifecycleStep)) );
     }
 }
 
