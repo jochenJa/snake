@@ -183,7 +183,10 @@ var matrix = {
         }, (this.lifecycle - (this.level * this.lifecycleStep)) );
     },
 
-    changedirection: function(direction) { this.direction = direction; }
+    changedirection: function(direction) {
+        if(direction(this.direction(this.$head.attr('id'))) == this.$head.attr('id')) return;
+        this.direction = direction;
+    }
 }
 
 
