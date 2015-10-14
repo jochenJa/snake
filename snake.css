@@ -25,7 +25,19 @@
 }
 
 #leveltracker {
+    display: inline-block;
     background-color: cornflowerblue;
+    color: black;
+    font-family: arial;
+    font-weight: bold;
+    height: 25px;
+    width: 150px;
+    text-align: center;
+    padding-top: 5px;
+}
+#foodtracker {
+    display: inline-block;
+    background-color: indianred;
     color: black;
     font-family: arial;
     font-weight: bold;

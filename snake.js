@@ -81,10 +81,11 @@ var matrix = {
     rows: 30,
     cols: 30,
     lifecycle: 240,
-    lifecycleStep: 6,
+    lifecycleStep: 12,
     tail: [],
     directionChain: [],
     level: 0,
+    food: 0,
     direction: coords.randomDirection(),
 
     inDirection: function (coId) {
@@ -97,7 +98,7 @@ var matrix = {
     nextSpotInDirection: function (coId) { return this.spot(this.inDirection(coId)); },
     createSnake: function () {
         var $tail;
-        do { $tail = this.randomSpotAroundCenter(); } while(! this.takenBy(this.cleanpart(), $tail))
+        do { $tail = this.randomSpotAroundCenter(); } while(! this.takenBy(this.cleanpart(), $tail));
         $tail.html(this.tailpart());
         this.tail.unshift($tail.attr('id'));
 
@@ -112,8 +113,6 @@ var matrix = {
     randomSpotAroundCenter: function () {
         upLeft = [Math.floor(matrix.rows/3), Math.floor(matrix.cols/3)];
         downRight = [upLeft[0]*2, upLeft[1]*2];
-        console.log(upLeft);
-        console.log(downRight);
         return matrix.spot(coords.random(upLeft, downRight));
     },
 
@@ -123,17 +122,22 @@ var matrix = {
 
     createFood: function (spotFunction) {
         var $spot;
-        do { $spot = spotFunction(); } while(! this.takenBy(this.cleanpart(), $spot))
+        do { $spot = spotFunction(); } while(! this.takenBy(this.cleanpart(), $spot));
         $spot.html(this.foodpart());
     },
 
     levelTracker: function () {
-        return $('<div />', {id: 'leveltracker', html: 'Level ' + this.level});
+        return $('<div />', {id: 'leveltracker', html: 'Level ' + this.level + '.' + (this.food % 3)});
+    },
+
+    foodTracker: function () {
+        return $('<div />', {id: 'foodtracker', html: 'Food ' + this.food});
     },
     init: function(anchor) {
         $anchor = anchor;
         this.fillUp();
         $anchor.append(this.levelTracker());
+        //$anchor.append(this.foodTracker());
         this.createSnake();
         this.createFood(this.randomSpotAroundCenter);
     },
@@ -161,6 +165,11 @@ var matrix = {
 
     spot: function (coId) { return $('#' + coId); },
 
+    eats: function () {
+        this.food++;
+        $('#leveltracker').replaceWith(this.levelTracker());
+    },
+
     snakeMoves: function (nextLevel, endGame) {
         var $spot = this.nextSpotInDirection(this.$head.attr('id'));
         switch(true) {
@@ -174,15 +183,15 @@ var matrix = {
                 this.$head.html(this.headpart());
                 break;
             case this.takenBy(this.foodpart(), $spot):
+                this.eats();
                 this.$head.html(this.tailpart());
                 this.tail.push(this.$head.attr('id'));
                 this.$head = $spot;
                 this.$head.html(this.headpart());
+
                 this.createFood(this.randomSpot);
                 break;
             default :
-                //console.log(this.direction(this.$head.attr('id')));
-                //console.log(this.directionChain);
                 endGame('Game ends, snake died');
         }
 
@@ -213,7 +222,6 @@ var matrix = {
     changedirection: function(direction) {
         if(direction(this.direction(this.$head.attr('id'))) == this.$head.attr('id')) return;
         this.directionChain.push(direction);
-        console.debug(this.directionChain);
     }
 }
 
