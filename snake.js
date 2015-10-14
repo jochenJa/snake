@@ -75,13 +75,10 @@ var matrix = {
     lifecycle: 240,
     lifecycleStep: 6,
     tail: [],
-    level: 1,
+    level: 0,
+    direction: coords.randomDirection(),
 
-    nextSpotInDirection: function (coId) {
-        if(typeof this.direction === 'undefined') { this.direction = coords.randomDirection(); }
-        $spot = $('#'+this.direction(coId));
-        return $spot;
-    },
+    nextSpotInDirection: function (coId) { return this.spot(this.direction(coId)); },
     createSnake: function () {
         var $tail;
         do { $tail = this.randomSpot(); } while(! this.takenBy(this.cleanpart(), $tail))
@@ -156,15 +153,17 @@ var matrix = {
                 this.tail.push(this.$head.attr('id'));
                 this.$head = $spot;
                 this.$head.html(this.headpart());
-
                 this.createFood();
-
-                // next level when grows 3 tailparts
-                if(Math.floor(this.tail.length/3) > this.level) { nextLevel() };
                 break;
             default :
-                endGame();
+                endGame('Game ends, snake died');
         }
+
+        // next level when snake grows by 3 tailparts
+        console.log(this.tail.length + ':' + Math.floor(this.tail.length/3) +':'+ this.level);
+        if(Math.floor(this.tail.length/3) > this.level) { nextLevel(); }
+
+        if(this.level > Math.floor(this.lifecycle/this.lifecycleStep)) { endGame('Game finished!'); }
     },
 
     wakesUp: function() {
@@ -178,7 +177,7 @@ var matrix = {
         var id = setInterval(function() {
             matrix.snakeMoves(
                 function() { matrix.nextLevel(id); console.log('next level');},
-                function() { clearInterval(id); console.log('end game, snake died.');}
+                function(message) { clearInterval(id); console.log(message);}
             );
         }, (this.lifecycle - (this.level * this.lifecycleStep)) );
     }
