@@ -159,7 +159,8 @@ var matrix = {
 
                 this.createFood();
 
-                if(Math.floor(this.tail.length/3) )nextLevel();
+                // next level when grows 3 tailparts
+                if(Math.floor(this.tail.length/3) > this.level) { nextLevel() };
                 break;
             default :
                 endGame();
