@@ -55,16 +55,24 @@ var coords = {
     },
     toCoId: function (co) { return co[0]+'v'+co[1]; },
 
-    up: function(coId) { return coords.toCoId(coords.mutate([-1,0], coords.convert(coId))); },
-    down: function(coId) { return coords.toCoId(coords.mutate([1,0], coords.convert(coId))); },
-    left: function(coId) { return coords.toCoId(coords.mutate([0,-1], coords.convert(coId))); },
-    right: function(coId) { return coords.toCoId(coords.mutate([0,1], coords.convert(coId))); },
+    up: function up(coId) { return coords.toCoId(coords.mutate([-1,0], coords.convert(coId))); },
+    down: function down(coId) { return coords.toCoId(coords.mutate([1,0], coords.convert(coId))); },
+    left: function left(coId) { return coords.toCoId(coords.mutate([0,-1], coords.convert(coId))); },
+    right: function right(coId) { return coords.toCoId(coords.mutate([0,1], coords.convert(coId))); },
 
     randomDirection: function() {
         var arr = [coords.down, coords.up, coords.left, coords.right];
         var index = Math.floor(Math.random() * 4);
 
         return arr[index];
+    },
+
+    random: function(leftUp, downRight) {
+        var rows = Math.abs(leftUp[0] - downRight[0] + 1);
+        var cols = Math.abs(leftUp[1] - downRight[1] + 1);
+        coId = this.toCoId([Math.floor((Math.random() * rows) + leftUp[0]), Math.floor((Math.random() * cols) + leftUp[1])]);
+        console.log(coId);
+        return coId;
     }
 }
 
@@ -75,13 +83,21 @@ var matrix = {
     lifecycle: 240,
     lifecycleStep: 6,
     tail: [],
+    directionChain: [],
     level: 0,
     direction: coords.randomDirection(),
 
-    nextSpotInDirection: function (coId) { return this.spot(this.direction(coId)); },
+    inDirection: function (coId) {
+        if(nextdirection = this.directionChain.pop()) {
+            this.direction = nextdirection;
+        }
+
+        return this.direction(coId);
+    },
+    nextSpotInDirection: function (coId) { return this.spot(this.inDirection(coId)); },
     createSnake: function () {
         var $tail;
-        do { $tail = this.randomSpot(); } while(! this.takenBy(this.cleanpart(), $tail))
+        do { $tail = this.randomSpotAroundCenter(); } while(! this.takenBy(this.cleanpart(), $tail))
         $tail.html(this.tailpart());
         this.tail.unshift($tail.attr('id'));
 
@@ -90,15 +106,24 @@ var matrix = {
     },
 
     randomSpot: function () {
-        return $('#'+Math.floor((Math.random() * 10) + 1)+'v'+Math.floor((Math.random() * 10) + 1));
+        return matrix.spot(coords.random([1,1], [matrix.rows,matrix.cols]));
     },
+
+    randomSpotAroundCenter: function () {
+        upLeft = [Math.floor(matrix.rows/3), Math.floor(matrix.cols/3)];
+        downRight = [upLeft[0]*2, upLeft[1]*2];
+        console.log(upLeft);
+        console.log(downRight);
+        return matrix.spot(coords.random(upLeft, downRight));
+    },
+
     takenBy: function ($part, $container) {
         return $container.children('.' + $part.attr('class')).length > 0;
     },
 
-    createFood: function () {
+    createFood: function (spotFunction) {
         var $spot;
-        do { $spot = this.randomSpot(); } while(! this.takenBy(this.cleanpart(), $spot))
+        do { $spot = spotFunction(); } while(! this.takenBy(this.cleanpart(), $spot))
         $spot.html(this.foodpart());
     },
 
@@ -110,7 +135,7 @@ var matrix = {
         this.fillUp();
         $anchor.append(this.levelTracker());
         this.createSnake();
-        this.createFood();
+        this.createFood(this.randomSpotAroundCenter);
     },
 
     cleanpart: function () { return $('<div />', {class: 'empty', html: '&nbsp;'}); },
@@ -153,9 +178,11 @@ var matrix = {
                 this.tail.push(this.$head.attr('id'));
                 this.$head = $spot;
                 this.$head.html(this.headpart());
-                this.createFood();
+                this.createFood(this.randomSpot);
                 break;
             default :
+                //console.log(this.direction(this.$head.attr('id')));
+                //console.log(this.directionChain);
                 endGame('Game ends, snake died');
         }
 
@@ -185,7 +212,8 @@ var matrix = {
 
     changedirection: function(direction) {
         if(direction(this.direction(this.$head.attr('id'))) == this.$head.attr('id')) return;
-        this.direction = direction;
+        this.directionChain.push(direction);
+        console.debug(this.directionChain);
     }
 }
 
