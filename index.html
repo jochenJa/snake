@@ -3,12 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>some snake ?</title>
-    <link rel="stylesheet" href="snake.css">
-</head>
+    <link rel="stylesheet" href="css/snake.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    </head>
 <body>
+
  <div id="snake_window"></div>
- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
- <script type="text/javascript" src="snake.js"></script>
+ <div id="controls">
+     <table>
+         <tr>
+             <td rowspan="2"><button class="action"><i class="fa fa-arrow-left"></i></button></td>
+             <td><button class="action"><i class="fa fa-arrow-up"></i></button></td>
+             <td rowspan="2"><button class="action"><i class="fa fa-arrow-right"></i></button></td>
+         </tr>
+         <tr>
+            <td><button class="action"><i class="fa fa-arrow-down"></i></button></td>
+         </tr>
+     </table>
+ </div>
+ <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+ <script type="text/javascript" src="js/snake.js"></script>
  <script type="text/javascript">
      jQuery('document').ready(function($) {
          matrix.init($('#snake_window'));
@@ -31,6 +45,32 @@
                  default: return;
              }
          });
+
+         $(".action").click(function() {
+             $('div.action').removeClass('clicked');
+             $(this).addClass('clicked');
+
+             var direction = $(this).find('i.fa').attr('class');
+             switch(direction.substring(direction.lastIndexOf("-")+1)) {
+                 case 'left':
+                     matrix.changedirection(coords.left);
+                     break;
+                 case 'up':
+                     matrix.changedirection(coords.up);
+                     break;
+                 case 'right':
+                     matrix.changedirection(coords.right);
+                     break;
+                 case 'down':
+                     matrix.changedirection(coords.down);
+                     break;
+                 default: return;
+             }
+         });
+         $('.fa-arrow-left').click(function() { matrix.changedirection(coords.left)});
+         $('.fa-arrow-right').click(function() { matrix.changedirection(coords.right)});
+         $('.fa-arrow-up').click(function() { matrix.changedirection(coords.up)});
+         $('.fa-arrow-down').click(function() { matrix.changedirection(coords.down)});
      });
 
  </script>
