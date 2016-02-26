@@ -71,7 +71,7 @@ var coords = {
         var rows = Math.abs(leftUp[0] - downRight[0] + 1);
         var cols = Math.abs(leftUp[1] - downRight[1] + 1);
         coId = this.toCoId([Math.floor((Math.random() * rows) + leftUp[0]), Math.floor((Math.random() * cols) + leftUp[1])]);
-        console.log(coId);
+        //console.log(coId);
         return coId;
     }
 }
@@ -80,7 +80,7 @@ var coords = {
 var matrix = {
     rows: 30,
     cols: 30,
-    lifecycle: 240,
+    lifecycle: 500,
     lifecycleStep: 12,
     tail: [],
     directionChain: [],
@@ -135,8 +135,8 @@ var matrix = {
     },
     init: function(anchor) {
         $anchor = anchor;
-        this.fillUp();
         $anchor.append(this.levelTracker());
+        this.fillUp();
         //$anchor.append(this.foodTracker());
         this.createSnake();
         this.createFood(this.randomSpotAroundCenter);
@@ -150,15 +150,16 @@ var matrix = {
     fillUp: function() {
         var $container = $('<div />', {id: 'matrix'});
         for(var i=1;i<=this.rows;i++) {
+            $row = $('<div />', {class: 'row'});
             for(var j=1;j<=this.cols;j++) {
                 var $col = $('<div />', {
                     id: coords.toCoId([i, j]),
                     html: this.cleanpart()
                 });
 
-                $container.append($col);
+                $row.append($col);
             }
-            $container.append($('<br>'));
+            $container.append($row);
         }
         $anchor.append($container);
     },
